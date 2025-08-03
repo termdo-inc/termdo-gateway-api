@@ -1,0 +1,32 @@
+*
+
+# >-----< INCLUDES >-----< #
+
+# [+]: Git files
+!.gitignore
+
+# [+]: Repo files
+!LICENSE.md
+!README.md
+
+# [+]: Source files
+!source/
+!source/**
+
+# [+]: Go files
+!go.mod
+!go.sum
+
+# [+]: Config files
+!.editorconfig
+
+# [+]: Docker files
+!.dockerignore
+!compose.yaml
+!Dockerfile
+
+# >-----< EXCLUDES >-----< #
+
+# [-]: macOS files
+.DS_Store
+**/.DS_Store
