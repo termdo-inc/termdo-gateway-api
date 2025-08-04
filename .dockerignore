@@ -1,0 +1,19 @@
+*
+
+# >-----< INCLUDES >-----< #
+
+# [+]: Install stage
+!go.mod
+!go.sum
+
+# [+]: Build stage
+!source/
+!source/**
+
+# [+]: Run stage
+
+# >-----< EXCLUDES >-----< #
+
+# [-]: MacOS files
+.DS_Store
+**/.DS_Store
