@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"net/http/httputil"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -34,6 +35,14 @@ func AuthProxy(apiBase string) gin.HandlerFunc {
 
 		if rescp.Buffer.Len() > 0 {
 			helpers.SetHostnames(rescp, ctx, &authApiHostname, nil)
+
+			newBody := rescp.Buffer.Bytes()
+
+			utils.CopyHeaders(rescp.Header(), ctx.Writer)
+
+			ctx.Writer.Header().Set("Content-Length", strconv.Itoa(len(newBody)))
+			ctx.Writer.WriteHeader(rescp.Status)
+			ctx.Writer.Write(newBody)
 		} else {
 			ctx.Writer.WriteHeader(rescp.Status)
 		}

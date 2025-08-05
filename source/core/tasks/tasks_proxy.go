@@ -60,15 +60,19 @@ func TasksProxy(apiBase string) gin.HandlerFunc {
 
 		if rescp.Buffer.Len() > 0 {
 			helpers.SetHostnames(rescp, ctx, &authApiHostname, &tasksApiHostname)
+
+			var body map[string]any
+			_ = json.Unmarshal(rescp.Buffer.Bytes(), &body)
+			body["token"] = parsed.Token
+			newBody, _ := json.Marshal(body)
+
+			utils.CopyHeaders(rescp.Header(), ctx.Writer)
+
+			ctx.Writer.Header().Set("Content-Length", strconv.Itoa(len(newBody)))
+			ctx.Writer.WriteHeader(rescp.Status)
+			ctx.Writer.Write(newBody)
+		} else {
+			ctx.Writer.WriteHeader(rescp.Status)
 		}
-
-		var body map[string]any
-		_ = json.Unmarshal(rescp.Buffer.Bytes(), &body)
-		body["token"] = parsed.Token
-		newBody, _ := json.Marshal(body)
-
-		ctx.Writer.Header().Set("Content-Length", strconv.Itoa(len(newBody)))
-		ctx.Writer.WriteHeader(rescp.Status)
-		ctx.Writer.Write(newBody)
 	}
 }
