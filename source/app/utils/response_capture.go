@@ -12,11 +12,11 @@ type ResponseCapture struct {
 	Status int
 }
 
-func (r *ResponseCapture) WriteHeader(statusCode int) {
-	r.Status = statusCode
-	r.ResponseWriter.WriteHeader(statusCode)
+func (rescp *ResponseCapture) WriteHeader(statusCode int) {
+	rescp.Status = statusCode
+	rescp.ResponseWriter.WriteHeader(statusCode)
 }
 
-func (r *ResponseCapture) Write(b []byte) (int, error) {
-	return r.Buffer.Write(b)
+func (rescp *ResponseCapture) Write(b []byte) (int, error) {
+	return rescp.Buffer.Write(b)
 }

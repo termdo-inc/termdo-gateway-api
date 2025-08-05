@@ -12,51 +12,57 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"termdo.com/gateway-api/source/app/config"
+	"termdo.com/gateway-api/source/app/constants"
+	"termdo.com/gateway-api/source/app/helpers"
 	"termdo.com/gateway-api/source/app/utils"
 	"termdo.com/gateway-api/source/core/tasks/schemas"
 )
 
-func TasksProxy(apiBase, prefix string) gin.HandlerFunc {
+func TasksProxy(apiBase string) gin.HandlerFunc {
 	apiURL, _ := url.Parse(apiBase)
 	proxy := httputil.NewSingleHostReverseProxy(apiURL)
 
-	return func(c *gin.Context) {
-		authHeader := c.GetHeader("Authorization")
-		if authHeader == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": "Missing Authorization header",
-			})
-			return
-		}
-
+	return func(ctx *gin.Context) {
 		req, _ := http.NewRequest("GET", config.AuthApiURL+"/refresh", nil)
+		req.Header.Set("Authorization", ctx.GetHeader("Authorization"))
 		res, err := http.DefaultClient.Do(req)
 		if err != nil || res.StatusCode >= 400 {
-			c.Status(res.StatusCode)
+			ctx.Status(res.StatusCode)
 			body, _ := io.ReadAll(res.Body)
-			c.Writer.Write(body)
+			ctx.Writer.Write(body)
 			return
 		}
 
+		authApiHostname := res.Header.Get(constants.HeaderHostnameKey)
+		res.Header.Del(constants.HeaderHostnameKey)
+
 		var parsed schemas.RefreshResponse
-		body, _ := io.ReadAll(res.Body)
-		_ = json.Unmarshal(body, &parsed)
+		refreshBody, _ := io.ReadAll(res.Body)
+		_ = json.Unmarshal(refreshBody, &parsed)
 
-		c.Request.URL.Path = "/" + strconv.Itoa(parsed.AccountID) +
-			strings.TrimPrefix(c.Request.URL.Path, prefix)
+		ctx.Request.URL.Path = "/" + strconv.Itoa(parsed.AccountID) +
+			strings.TrimPrefix(ctx.Request.URL.Path, TasksApiPrefix)
 
-		rec := &utils.ResponseCapture{
-			ResponseWriter: c.Writer,
+		rescp := &utils.ResponseCapture{
+			ResponseWriter: ctx.Writer,
 			Buffer:         &bytes.Buffer{},
 		}
-		proxy.ServeHTTP(rec, c.Request)
+		proxy.ServeHTTP(rescp, ctx.Request)
 
-		c.Writer.WriteHeader(rec.Status)
-		var proxyBody map[string]any
-		_ = json.Unmarshal(rec.Buffer.Bytes(), &proxyBody)
-		proxyBody["token"] = parsed.Token
+		tasksApiHostname := rescp.Header().Get(constants.HeaderHostnameKey)
+		rescp.Header().Del(constants.HeaderHostnameKey)
 
-		newBody, _ := json.Marshal(proxyBody)
-		c.Writer.Write(newBody)
+		if rescp.Buffer.Len() > 0 {
+			helpers.SetHostnames(rescp, ctx, &authApiHostname, &tasksApiHostname)
+		}
+
+		var body map[string]any
+		_ = json.Unmarshal(rescp.Buffer.Bytes(), &body)
+		body["token"] = parsed.Token
+		newBody, _ := json.Marshal(body)
+
+		ctx.Writer.Header().Set("Content-Length", strconv.Itoa(len(newBody)))
+		ctx.Writer.WriteHeader(rescp.Status)
+		ctx.Writer.Write(newBody)
 	}
 }
