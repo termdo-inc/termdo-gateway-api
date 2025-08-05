@@ -23,8 +23,14 @@ func TasksProxy(apiBase string) gin.HandlerFunc {
 	proxy := httputil.NewSingleHostReverseProxy(apiURL)
 
 	return func(ctx *gin.Context) {
+		authHeader := ctx.GetHeader("Authorization")
+		if authHeader == "" {
+			ctx.Status(http.StatusUnauthorized)
+			return
+		}
+
 		req, _ := http.NewRequest("GET", config.AuthApiURL+"/refresh", nil)
-		req.Header.Set("Authorization", ctx.GetHeader("Authorization"))
+		req.Header.Set("Authorization", authHeader)
 		res, err := http.DefaultClient.Do(req)
 		if err != nil || res.StatusCode >= 400 {
 			ctx.Status(res.StatusCode)
