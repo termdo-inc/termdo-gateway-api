@@ -19,7 +19,10 @@ func main() {
 
 	// Load environment variables
 	if *devMode {
+		gin.SetMode(gin.DebugMode)
 		godotenv.Load(".env")
+	} else {
+		gin.SetMode(gin.ReleaseMode)
 	}
 
 	// Load configuration
