@@ -16,7 +16,10 @@ func SetHostnames(
 	tasksApiHostname *string,
 ) {
 	var body map[string]any
-	_ = json.Unmarshal(rescp.Buffer.Bytes(), &body)
+
+	if err := json.Unmarshal(rescp.Buffer.Bytes(), &body); err != nil || body == nil {
+		body = make(map[string]any)
+	}
 
 	hostnames := map[string]string{
 		utils.KebabToCamelCase(config.AppHost): config.AppHostname,
