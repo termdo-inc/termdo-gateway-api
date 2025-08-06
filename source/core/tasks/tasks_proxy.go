@@ -15,7 +15,7 @@ import (
 	"termdo.com/gateway-api/source/app/constants"
 	"termdo.com/gateway-api/source/app/helpers"
 	"termdo.com/gateway-api/source/app/utils"
-	"termdo.com/gateway-api/source/core/tasks/schemas"
+	"termdo.com/gateway-api/source/core/auth/schemas"
 )
 
 func TasksProxy(apiBase string) gin.HandlerFunc {
@@ -46,7 +46,7 @@ func TasksProxy(apiBase string) gin.HandlerFunc {
 		refreshBody, _ := io.ReadAll(res.Body)
 		_ = json.Unmarshal(refreshBody, &parsed)
 
-		ctx.Request.URL.Path = "/" + strconv.Itoa(parsed.AccountID) +
+		ctx.Request.URL.Path = "/" + strconv.Itoa(parsed.Data.AccountID) +
 			strings.TrimPrefix(ctx.Request.URL.Path, TasksApiPrefix)
 
 		rescp := &utils.ResponseCapture{
