@@ -20,13 +20,13 @@
 # [+]: Config files
 !.editorconfig
 
+# [+]: Environment files
+!.env.example
+
 # [+]: Docker files
 !.dockerignore
 !compose.yaml
 !Dockerfile
-
-# [+]: Environment files
-!.env.example
 
 # >-----< EXCLUDES >-----< #
 
