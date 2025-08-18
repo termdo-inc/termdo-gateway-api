@@ -4,8 +4,9 @@ import "net/http"
 
 func CopyHeaders(src http.Header, dst http.ResponseWriter) {
 	for key, values := range src {
-		for _, v := range values {
-			dst.Header().Add(key, v)
+		dst.Header().Set(key, values[0])
+		for i := 1; i < len(values); i++ {
+			dst.Header().Add(key, values[i])
 		}
 	}
 }

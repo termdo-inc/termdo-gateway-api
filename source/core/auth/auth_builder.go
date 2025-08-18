@@ -8,6 +8,12 @@ import (
 const RoutePrefix = "/auth"
 
 func BuildRoutes(app *gin.Engine) {
-	app.PUT(RoutePrefix+"/logout", PutLogout())
-	app.Any(RoutePrefix+"/*rest", Proxy(config.AuthApiURL))
+	group := app.Group(RoutePrefix)
+	group.Any("/*rest", func(c *gin.Context) {
+		if c.Request.Method == "PUT" && c.Request.URL.Path == "/logout" {
+			PutLogout()(c)
+			return
+		}
+		Proxy(config.AuthApiURL)(c)
+	})
 }

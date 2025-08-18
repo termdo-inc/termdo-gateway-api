@@ -26,7 +26,7 @@ WORKDIR /app/
 
 COPY source/ source/
 
-RUN go build -ldflags="-s -w" -o /app/termdo-gateway-api ./source/main.go
+RUN go build -ldflags="-s -w" -o termdo-gateway-api source/main.go
 
 # >-----< RUN STAGE >-----< #
 
