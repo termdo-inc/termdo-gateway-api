@@ -10,14 +10,14 @@ import (
 )
 
 func SetHostnames(
-	rescp *utils.ResponseCapture,
 	ctx *gin.Context,
+	rescp *utils.ResponseCapture,
 	authApiHostname *string,
 	tasksApiHostname *string,
 ) {
 	var body map[string]any
 
-	if err := json.Unmarshal(rescp.Buffer.Bytes(), &body); err != nil || body == nil {
+	if err := json.Unmarshal(rescp.Buffer.Bytes(), &body); err != nil {
 		body = make(map[string]any)
 	}
 

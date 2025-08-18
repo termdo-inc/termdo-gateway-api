@@ -5,8 +5,9 @@ import (
 	"termdo.com/gateway-api/source/app/config"
 )
 
-const AuthApiPrefix = "/auth"
+const RoutePrefix = "/auth"
 
 func BuildRoutes(app *gin.Engine) {
-	app.Any(AuthApiPrefix+"/*rest", AuthProxy(config.AuthApiURL))
+	app.PUT(RoutePrefix+"/logout", PutLogout())
+	app.Any(RoutePrefix+"/*rest", Proxy(config.AuthApiURL))
 }

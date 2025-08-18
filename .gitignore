@@ -25,6 +25,9 @@
 !compose.yaml
 !Dockerfile
 
+# [+]: Environment files
+!.env.example
+
 # >-----< EXCLUDES >-----< #
 
 # [-]: macOS files

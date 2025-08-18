@@ -5,8 +5,8 @@ import (
 	"termdo.com/gateway-api/source/app/config"
 )
 
-const TasksApiPrefix = "/tasks"
+const RoutePrefix = "/tasks"
 
 func BuildRoutes(app *gin.Engine) {
-	app.Any(TasksApiPrefix+"/*rest", TasksProxy(config.TasksApiURL))
+	app.Any(RoutePrefix+"/*rest", Proxy(config.TasksApiURL))
 }

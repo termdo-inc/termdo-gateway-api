@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"termdo.com/gateway-api/source/app/config"
+	"termdo.com/gateway-api/source/app/middleware"
 	"termdo.com/gateway-api/source/core/auth"
 	"termdo.com/gateway-api/source/core/tasks"
 )
@@ -28,10 +29,14 @@ func main() {
 	// Load configuration
 	config.LoadAppConfig()
 	config.LoadApiConfig()
+	config.LoadCookieConfig()
 
 	// Application
 	app := gin.Default()
 	app.SetTrustedProxies(nil)
+
+	// Middlewares
+	app.Use(middleware.RequestAuth())
 
 	// Routes
 	auth.BuildRoutes(app)

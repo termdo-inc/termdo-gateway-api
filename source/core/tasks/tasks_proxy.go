@@ -18,7 +18,7 @@ import (
 	"termdo.com/gateway-api/source/core/auth/schemas"
 )
 
-func TasksProxy(apiBase string) gin.HandlerFunc {
+func Proxy(apiBase string) gin.HandlerFunc {
 	apiURL, _ := url.Parse(apiBase)
 	proxy := httputil.NewSingleHostReverseProxy(apiURL)
 
@@ -47,7 +47,7 @@ func TasksProxy(apiBase string) gin.HandlerFunc {
 		_ = json.Unmarshal(refreshBody, &parsed)
 
 		ctx.Request.URL.Path = "/" + strconv.Itoa(parsed.Data.AccountID) +
-			strings.TrimPrefix(ctx.Request.URL.Path, TasksApiPrefix)
+			strings.TrimPrefix(ctx.Request.URL.Path, RoutePrefix)
 
 		rescp := &utils.ResponseCapture{
 			ResponseWriter: ctx.Writer,
@@ -59,12 +59,10 @@ func TasksProxy(apiBase string) gin.HandlerFunc {
 		rescp.Header().Del(constants.HeaderHostnameKey)
 
 		if rescp.Buffer.Len() > 0 {
-			helpers.SetHostnames(rescp, ctx, &authApiHostname, &tasksApiHostname)
+			helpers.SetHostnames(ctx, rescp, &authApiHostname, &tasksApiHostname)
+			helpers.NormalizeTokenResponse(ctx, rescp, parsed.Token)
 
-			var body map[string]any
-			_ = json.Unmarshal(rescp.Buffer.Bytes(), &body)
-			body["token"] = parsed.Token
-			newBody, _ := json.Marshal(body)
+			newBody := rescp.Buffer.Bytes()
 
 			utils.CopyHeaders(rescp.Header(), ctx.Writer)
 

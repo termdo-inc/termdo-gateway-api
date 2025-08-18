@@ -17,9 +17,10 @@ type ClientError struct {
 }
 
 type BaseResponse[T any] struct {
-	HttpStatus   HttpStatus    `json:"httpStatus"`
-	ServerError  *ServerError  `json:"serverError"`
-	ClientErrors []ClientError `json:"clientErrors"`
-	Data         T             `json:"data"`
-	Token        *string       `json:"token"`
+	Hostnames    *map[string]string `json:"hostnames"`
+	HttpStatus   HttpStatus        `json:"httpStatus"`
+	ServerError  *ServerError      `json:"serverError"`
+	ClientErrors []ClientError     `json:"clientErrors"`
+	Data         T                 `json:"data"`
+	Token        *string           `json:"token"`
 }

@@ -13,14 +13,14 @@ import (
 	"termdo.com/gateway-api/source/app/utils"
 )
 
-func AuthProxy(apiBase string) gin.HandlerFunc {
+func Proxy(apiBase string) gin.HandlerFunc {
 	apiURL, _ := url.Parse(apiBase)
 	proxy := httputil.NewSingleHostReverseProxy(apiURL)
 
 	return func(ctx *gin.Context) {
 		ctx.Request.URL.Path = strings.TrimPrefix(
 			ctx.Request.URL.Path,
-			AuthApiPrefix,
+			RoutePrefix,
 		)
 		ctx.Request.Host = apiURL.Host
 
@@ -34,7 +34,8 @@ func AuthProxy(apiBase string) gin.HandlerFunc {
 		rescp.Header().Del(constants.HeaderHostnameKey)
 
 		if rescp.Buffer.Len() > 0 {
-			helpers.SetHostnames(rescp, ctx, &authApiHostname, nil)
+			helpers.SetHostnames(ctx, rescp, &authApiHostname, nil)
+			helpers.NormalizeTokenResponse(ctx, rescp, nil)
 
 			newBody := rescp.Buffer.Bytes()
 
