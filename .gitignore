@@ -6,6 +6,7 @@
 !.gitignore
 
 # [+]: Repo files
+!CHANGELOG.md
 !LICENSE.md
 !README.md
 
