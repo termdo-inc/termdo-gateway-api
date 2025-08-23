@@ -10,7 +10,7 @@ const RoutePrefix = "/auth"
 func BuildRoutes(app *gin.Engine) {
 	group := app.Group(RoutePrefix)
 	group.Any("/*rest", func(c *gin.Context) {
-		if c.Request.Method == "PUT" && c.Request.URL.Path == "/logout" {
+		if c.Request.Method == "PUT" && c.Request.URL.Path == "/auth/logout" {
 			PutLogout()(c)
 			return
 		}
