@@ -28,6 +28,12 @@ COPY source/ source/
 
 RUN go build -ldflags="-s -w" -o termdo-gateway-api source/main.go
 
+# >-----< TEST STAGE >-----< #
+
+FROM builder AS tester
+
+RUN echo "[🔵]: No tests defined."
+
 # >-----< RUN STAGE >-----< #
 
 FROM scratch AS runner
